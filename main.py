@@ -309,16 +309,12 @@ def math_task_1():
         new_task.info = [str(f)]
         new_task.type = 2
 
+    
+        result_dict = {'result': result}
+        new_task.decide = json.dumps(result_dict)
+
         _id = db_sess.tasks.insert_one(new_task.asdict()).inserted_id
 
-
-        result_dict = {'result': result}
-        with open(fr'static/files/{_id}.json', 'w') as file:
-            file.write(json.dumps(result_dict))
-
-        new_task.solution_path = fr'static/files/{_id}.json'
-        res = db_sess.tasks.update_one({"_id": ObjectId(_id)}, {"$set":{"solution_path": new_task.solution_path}})
-        print(res)
 
         graph = sympy.plot(f, show=False, addaptive=False, xlim=(-11, 11), ylim=(-20, 25))
         graph.save(f'static/images/{_id}.png')
@@ -326,7 +322,6 @@ def math_task_1():
         im_2 = im.crop((20, 20, 600, 440))
         im_2.save(f'static/images/{_id}.png')
 
-        
         
         return redirect(f'/task/{_id}')
         # return render_template('second_task_solution.html', solution=result)
@@ -461,13 +456,9 @@ def task_1():
 
         new_task.info = legs
         new_task.type = 1
-        _id = db_sess.tasks.insert_one(new_task.asdict()).inserted_id
 
-        with open(fr'static/files/{_id}.json', 'w') as file:
-            file.write(json.dumps(result_dict))
-        new_task.solution_path = fr'static/files/{_id}.json'
-        res = db_sess.tasks.update_one({"_id": ObjectId(_id)}, {"$set":{"solution_path": new_task.solution_path}})
-        print(res)
+        new_task.decide = json.dumps(result_dict)
+        _id = db_sess.tasks.insert_one(new_task.asdict()).inserted_id
 
         return redirect(f'/task/{_id}')
 
@@ -503,8 +494,8 @@ def get_task(task_id):
                                elems=param, lines=len(legs), task_id=str(task_id), link='',
                                beauti='false')
     elif task.type == 2:
-        with open(f'static/files/{str(task_id)}.json', 'r') as file:
-            dict_ = json.loads(file.read())
+        dict_ = json.loads(task.decide)
+
         if len(db_sess.beautiful_links.find({"task_id": str(task_id)}).distinct("task_id")) == 1:
             return render_template('second_task_solution.html', line=task.info[0],
                                    solution=dict_['result'], task_id=str(task_id), beauti='true',

@@ -6,12 +6,12 @@ class Task:
 		if (dict_ is None):
 			self.type = 1
 			self.info = None
-			self.solution_path = None
+			self.decide = None
 		else:
 			self.type = dict_["type"]
 			self.info = dict_["info"]
-			self.solution_path = dict_["solution_path"]
+			self.decide = dict_["decide"]
 
 
 	def asdict(self):
-		return {"type": self.type, "info": self.info, "solution_path": self.solution_path}
+		return {"type": self.type, "info": self.info, "decide": self.decide}
